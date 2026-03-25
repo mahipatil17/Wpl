@@ -1,0 +1,154 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Inter', sans-serif;
+}
+
+body{
+  background: linear-gradient(135deg,#c9c7ff,#dce6ff,#cde9ff);
+  min-height:100vh;
+  color:#1a1a2e;
+}
+
+/* NAVBAR */
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 60px;
+  background:rgba(255,255,255,0.6);
+  backdrop-filter:blur(14px);
+}
+
+.nav-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.logo-box{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#6a5cff,#4aa3ff);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+}
+
+.nav-center a{
+  margin:0 12px;
+  text-decoration:none;
+  color:#555;
+}
+
+.nav-center .active{
+  background:#0f0f1a;
+  color:white;
+  padding:6px 12px;
+  border-radius:6px;
+}
+
+.logout-btn{
+  border:1px solid #ddd;
+  padding:6px 12px;
+  border-radius:6px;
+  background:white;
+  cursor:pointer;
+}
+
+/* HEADER */
+.header{
+  padding:40px 60px 20px;
+}
+
+.header h1{
+  font-size:28px;
+}
+
+.header p{
+  color:#555;
+}
+
+/* FILTER BOX */
+.filter-box{
+  margin:20px 60px;
+  padding:20px;
+  background:rgba(255,255,255,0.75);
+  backdrop-filter:blur(12px);
+  border-radius:18px;
+}
+
+.filters{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+
+.filters input,
+.filters select{
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ddd;
+}
+
+/* STUDENTS */
+.students-section{
+  padding:20px 60px 60px;
+}
+
+.count{
+  margin-bottom:20px;
+  color:#555;
+}
+
+.students-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+}
+
+.student-card{
+  background:rgba(255,255,255,0.75);
+  backdrop-filter:blur(12px);
+  padding:20px;
+  border-radius:18px;
+  text-align:center;
+  transition:0.3s;
+}
+
+.student-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 20px 40px rgba(106,92,255,0.15);
+}
+
+.student-card img{
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  margin-bottom:10px;
+}
+
+.branch{
+  font-size:13px;
+  color:#666;
+  margin-bottom:8px;
+}
+
+.desc{
+  font-size:14px;
+  color:#555;
+  margin-bottom:12px;
+}
+
+.tags span{
+  display:inline-block;
+  background:#eef1ff;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  margin:4px;
+}

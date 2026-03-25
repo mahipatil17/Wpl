@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FY Connect Admin Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#c9c7ff,#dce6ff,#cde9ff);
+min-height:100vh;
+}
+
+/* ================= NAVBAR ================= */
+
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:18px 60px;
+background:rgba(255,255,255,.6);
+backdrop-filter:blur(14px);
+border-bottom:1px solid rgba(255,255,255,.4);
+}
+
+.nav-left{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.logo-box{
+width:38px;
+height:38px;
+border-radius:12px;
+background:linear-gradient(135deg,#6a5cff,#4aa3ff);
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+font-weight:600;
+}
+
+.brand{
+font-weight:600;
+}
+
+.nav-center{
+display:flex;
+gap:20px;
+}
+
+.nav-center a{
+text-decoration:none;
+color:#555;
+padding:6px 14px;
+border-radius:8px;
+font-weight:500;
+}
+
+.nav-center a.active{
+background:#0f0f1a;
+color:white;
+}
+
+.logout-btn{
+background:#ff4d4d;
+color:white;
+border:none;
+padding:8px 16px;
+border-radius:999px;
+cursor:pointer;
+}
+
+/* ================= CONTAINER ================= */
+
+.container{
+padding:60px;
+}
+
+/* ================= CARDS ================= */
+
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+margin-bottom:40px;
+}
+
+.card{
+background:rgba(255,255,255,.8);
+backdrop-filter:blur(12px);
+padding:30px;
+border-radius:20px;
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+box-shadow:0 20px 40px rgba(106,92,255,.15);
+}
+
+.card h2{
+color:#6a5cff;
+margin-bottom:8px;
+}
+
+/* ================= TABLE ================= */
+
+.table-box{
+background:rgba(255,255,255,.8);
+backdrop-filter:blur(12px);
+border-radius:20px;
+overflow:hidden;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th{
+background:linear-gradient(135deg,#6a5cff,#4aa3ff);
+color:white;
+padding:15px;
+text-align:left;
+}
+
+td{
+padding:14px;
+border-bottom:1px solid #eee;
+}
+
+tr:hover{
+background:#f7f8ff;
+}
+
+.delete{
+background:#ff4d4d;
+border:none;
+padding:6px 12px;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* Responsive */
+@media(max-width:768px){
+.navbar,.container{
+padding:20px;
+}
+.nav-center{
+display:none;
+}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar">
+
+  <div class="nav-left">
+    <div class="logo-box">⚙</div>
+    <div class="brand">FY Connect Admin</div>
+  </div>
+
+  <button class="logout-btn" onclick="logout()">Logout</button>
+
+</nav>
+
+<!-- ================= CONTENT ================= -->
+<div class="container">
+
+  <div class="stats">
+    <div class="card">
+      <h2>120</h2>
+      <p>Total Students</p>
+    </div>
+
+    <div class="card">
+      <h2>15</h2>
+      <p>Total Groups</p>
+    </div>
+
+    <div class="card">
+      <h2>45</h2>
+      <p>Active Today</p>
+    </div>
+  </div>
+
+  <h2 style="margin-bottom:15px;">Recent Registrations</h2>
+
+  <div class="table-box">
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Branch</th>
+        <th>Action</th>
+      </tr>
+
+      <tr>
+        <td>1</td>
+        <td>Aarav Kulkarni</td>
+        <td>aarav@fyconnect.edu</td>
+        <td>CSE</td>
+        <td><button class="delete">Delete</button></td>
+      </tr>
+
+      <tr>
+        <td>2</td>
+        <td>Meera Nair</td>
+        <td>meera@fyconnect.edu</td>
+        <td>AI & DS</td>
+        <td><button class="delete">Delete</button></td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+
+<script>
+function logout(){
+  window.location.href="index.html";
+}
+</script>
+
+</body>
+</html>
+
+
