@@ -1,0 +1,111 @@
+<?php
+session_start();
+
+if (isset($_SESSION['admin'])) {
+    header("Location: admin_dashboard.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Login</title>
+<style>
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+font-family:Arial;
+background:#eef1ff;
+}
+
+
+.card{
+background:white;
+padding:30px;
+border-radius:10px;
+width:320px;
+text-align:center;
+box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+
+input{
+width:100%;
+padding:10px;
+margin-top:12px;
+border:1px solid #ccc;
+border-radius:6px;
+}
+
+
+button{
+margin-top:15px;
+padding:10px;
+width:100%;
+background:#6a5cff;
+color:white;
+border:none;
+cursor:pointer;
+border-radius:6px;
+}
+
+
+.error{
+color:red;
+font-size:13px;
+margin-top:8px;
+}
+</style>
+</head>
+
+
+<body>
+
+
+<div class="card">
+
+
+<h2>Admin Login</h2>
+
+
+<input type="text" id="username" placeholder="Admin Username">
+<input type="password" id="password" placeholder="Password">
+
+
+<div class="error" id="errorMsg"></div>
+
+
+<button onclick="validateLogin()">Login</button>
+
+
+</div>
+
+
+<script>
+
+
+function validateLogin(){
+
+
+let user=document.getElementById("username").value.trim();
+let pass=document.getElementById("password").value.trim();
+let error=document.getElementById("errorMsg");
+
+
+/* EMPTY CHECK */
+if(user=="" || pass==""){
+error.innerHTML="All fields are required";
+return;
+}
+
+
+
+
+</script>
+
+
+</body>
+</html>
