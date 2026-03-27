@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FY Connect</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      color: #1a1a2e;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 60px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .logo-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .login-btn {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.15);
+      background: rgba(255,255,255,0.9);
+      font-size: 13px;
+      color: #111;
+      transition: 0.2s;
+    }
+
+    .login-btn:hover {
+      background: #111;
+      color: white;
+    }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 100px 20px 80px;
+      z-index: 1;
+    }
+
+    .hero h1 {
+      font-size: 52px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -1px;
+      text-shadow: 0 6px 20px rgba(0,0,0,0.8);
+    }
+
+    .hero p {
+      max-width: 600px;
+      margin: 20px auto 30px;
+      color: #eaeaea;
+      font-size: 15px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 50px;
+    }
+
+    .btn-primary {
+      background: #111;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: rgba(255,255,255,0.8);
+      padding: 12px 24px;
+      border-radius: 8px;
+      color: #111;
+    }
+
+    /* STATS */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.85);
+      padding: 14px 20px;
+      border-radius: 12px;
+      min-width: 120px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .stat h2 {
+      font-size: 24px;
+    }
+
+    .stat p {
+      font-size: 13px;
+      color: #333;
+    }
+
+    /* FEATURES */
+    .features {
+      padding: 80px 40px;
+      text-align: center;
+    }
+
+    .features h2 {
+      font-size: 28px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .features-sub {
+      color: #ddd;
+      margin-bottom: 40px;
+    }
+
+    .features-grid {
+      max-width: 1000px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: rgba(255,255,255,0.9);
+      padding: 20px;
+      border-radius: 14px;
+      text-align: left;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+      transition: 0.2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .feature-card h3 {
+      margin-bottom: 6px;
+      color: #111;
+    }
+
+    .feature-card p {
+      color: #444;
+      font-size: 14px;
+    }
+
+    /* BACKGROUND */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.65);
+      z-index: -1;
+    }
+
+    /* CONTACT */
+    .contact {
+      text-align: center;
+      padding: 60px 20px;
+      background: rgba(255,255,255,0.9);
+      margin-top: 60px;
+    }
+
+    .contact h2 {
+      margin-bottom: 10px;
+    }
+
+    .contact p {
+      color: #444;
+      font-size: 14px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<video autoplay muted loop id="bg-video">
+  <source src="video.mp4" type="video/mp4">
+</video>
+
+<div class="navbar">
+  <div class="logo">
+    <div class="logo-box">🎓</div>
+    FY Connect
+  </div>
+
+  <div class="nav-actions">
+    <a href="/fyconnect/login.php" class="login-btn">Student Login</a>
+    <a href="/fyconnect/admin_login.html" class="login-btn">Admin</a>
+  </div>
+</div>
+
+<section class="hero">
+  <h1>Connect. Collaborate.<br>Build Networks.</h1>
+
+  <p>The ultimate platform for first-year students to discover peers, join groups, and build meaningful connections.</p>
+
+  <div class="hero-buttons">
+    <a href="/fyconnect/login.php" class="btn-primary">Get Started</a>
+    <a href="#" class="btn-outline">Learn More</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><h2>100+</h2><p>Students</p></div>
+    <div class="stat"><h2>15+</h2><p>Groups</p></div>
+    <div class="stat"><h2>50+</h2><p>Connections</p></div>
+    <div class="stat"><h2>24/7</h2><p>Access</p></div>
+  </div>
+</section>
+
+<section class="features">
+  <h2>Everything You Need</h2>
+  <p class="features-sub">Simple tools to help you connect</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <h3>Find Batchmates</h3>
+      <p>Connect with students from your branch.</p>
+    </div>
+
+    <div class="feature-card">
+      <h3>Interest Groups</h3>
+      <p>Join communities and events.</p>
+    </div>
+
+    <div class="feature-card">
+      <h3>Hostel Communities</h3>
+      <p>Stay connected with hostel mates.</p>
+    </div>
+
+    <div class="feature-card">
+      <h3>Carpool</h3>
+      <p>Find travel buddies easily.</p>
+    </div>
+  </div>
+</section>
+
+<section class="contact">
+  <h2>Contact Us</h2>
+  <p>Email: support@fyconnect.com</p>
+  <p>Phone: +91 9876543210</p>
+</section>
+
+</body>
+</html>
