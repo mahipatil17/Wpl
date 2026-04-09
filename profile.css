@@ -11,8 +11,6 @@ body{
   color:#1a1a2e;
 }
 
-/* ================= NAVBAR ================= */
-
 .navbar{
   display:flex;
   justify-content:space-between;
@@ -72,14 +70,8 @@ body{
   cursor:pointer;
 }
 
-
-/* ================= PROFILE ================= */
-
 .profile-section{
   padding:60px;
-  display:flex;
-  flex-direction:column;
-  gap:30px;
 }
 
 .profile-card{
@@ -90,23 +82,30 @@ body{
   border:1px solid rgba(255,255,255,0.6);
 }
 
-.profile-header{
-  display:flex;
-  align-items:center;
-  gap:20px;
-  margin-bottom:30px;
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+  margin-bottom: 30px;
 }
 
-.profile-pic{
-  width:80px;
-  height:80px;
-  border-radius:50%;
-  background:linear-gradient(135deg,#6a5cff,#4aa3ff);
+.profile-title {
+  font-size: 24px;
+  margin: 0;
 }
 
-.subtext{
-  font-size:13px;
-  color:#666;
+.profile-pic {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-pic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .form-row{
@@ -155,60 +154,6 @@ input:focus{
   cursor:pointer;
 }
 
-
-/* ================= JOINED CLUB CARDS ================= */
-
-.joined-groups{
-  margin-top:20px;
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-  gap:15px;
-}
-
-.group-card{
-  background:white;
-  padding:18px;
-  border-radius:14px;
-  box-shadow:0 10px 20px rgba(0,0,0,.06);
-  transition:.3s;
-}
-
-.group-card:hover{
-  transform:translateY(-5px);
-}
-
-.group-card h4{
-  margin-bottom:6px;
-}
-
-.group-card p{
-  font-size:13px;
-  color:#666;
-}
-
-.empty-state{
-  grid-column:1/-1;
-  text-align:center;
-  padding:30px;
-  background:rgba(255,255,255,0.6);
-  border-radius:14px;
-  color:#666;
-}
-
-
-/* ERROR */
-.error{
-  color:red;
-  font-size:13px;
-  margin-top:4px;
-}
-
-input.error-input{
-  border:1px solid red;
-}
-
-
-/* Responsive */
 @media(max-width:768px){
 
   .navbar,
@@ -220,4 +165,13 @@ input.error-input{
     flex-direction:column;
   }
 
+  .profile-header{
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .profile-title{
+    text-align: center;
+  }
 }
