@@ -1,8 +1,7 @@
 <?php
 session_start();
 
-// Redirect if already logged in
-if (isset($_SESSION['user'])) {
+if (isset($_SESSION['user_id'])) {
   header("Location: dashboard.php");
   exit();
 }
@@ -135,7 +134,6 @@ if (isset($_SESSION['user'])) {
       <div class="tab" onclick="showRegister()">Register</div>
     </div>
 
-    <!-- LOGIN -->
     <form class="form" id="loginForm" action="login_process.php" method="POST">
       <h3>Welcome Back</h3>
       <small>Login to your account</small>
@@ -153,13 +151,13 @@ if (isset($_SESSION['user'])) {
       <button type="submit" class="btn">Login</button>
     </form>
 
-    <!-- REGISTER -->
-    <form class="form" id="registerForm" action="register_process.php" method="POST">
+    <form class="form" id="registerForm" action="register_process.php" method="POST" onsubmit="return validateName()">
       <h3>Create Account</h3>
 
       <div class="input-group">
         <label>Name</label>
-        <input type="text" name="name" placeholder="Enter name" required />
+        <input type="text" id="name" name="name" placeholder="Enter name" required />
+        <small id="nameError" style="color:red; display:none;">Only letters allowed</small>
       </div>
 
       <div class="input-group">
@@ -169,7 +167,23 @@ if (isset($_SESSION['user'])) {
 
       <div class="input-group">
         <label>Branch</label>
-        <input type="text" name="branch" placeholder="Enter branch" />
+        <select name="branch">
+          <option <?php if(isset($user['branch']) && $user['branch']=="Computer Science") echo "selected"; ?>>Computer Science</option>
+          <option <?php if(isset($user['branch']) && $user['branch']=="Electronics") echo "selected"; ?>>Electronics</option>
+          <option <?php if(isset($user['branch']) && $user['branch']=="Information Technology") echo "selected"; ?>>Information Technology</option>
+          <option <?php if(isset($user['branch']) && $user['branch']=="CBCS") echo "selected"; ?>>CBCS</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>College</label>
+        <select name="college">
+          <option>KJ Somaiya College of Engineering</option>
+          <option>VJTI Mumbai</option>
+          <option>SPIT Mumbai</option>
+          <option>DJ Sanghvi College of Engineering</option>
+          <option>Thadomal Shahani Engineering College</option>
+        </select>
       </div>
 
       <div class="input-group">
@@ -184,13 +198,13 @@ if (isset($_SESSION['user'])) {
 
       <div class="input-group">
         <label>Password</label>
-        <input type="password" name="password" placeholder="Enter password" required />
+        <input type="password" id="password" name="password" placeholder="Enter password" required onkeyup="checkPasswordStrength()" />
+        <small id="passwordHint" style="font-size:12px;"></small>
       </div>
 
       <button type="submit" class="btn">Register</button>
     </form>
 
-    <!-- MESSAGE -->
     <div class="message">
       <?php
       if (isset($_GET['error'])) {
@@ -218,6 +232,42 @@ function showLogin() {
   document.getElementById("loginForm").style.display = "block";
   document.querySelectorAll(".tab")[1].classList.remove("active");
   document.querySelectorAll(".tab")[0].classList.add("active");
+}
+
+function validateName() {
+  let name = document.getElementById("name").value;
+  let regex = /^[A-Za-z ]+$/;
+
+  if (!regex.test(name)) {
+    document.getElementById("nameError").style.display = "block";
+    return false;
+  }
+
+  document.getElementById("nameError").style.display = "none";
+  return true;
+}
+
+function checkPasswordStrength() {
+  let password = document.getElementById("password").value;
+  let hint = document.getElementById("passwordHint");
+
+  let strongRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[\W]).{8,}$/;
+
+  if (password.length === 0) {
+    hint.innerHTML = "";
+  } 
+  else if (password.length < 6) {
+    hint.style.color = "red";
+    hint.innerHTML = "Weak: Too short";
+  } 
+  else if (!strongRegex.test(password)) {
+    hint.style.color = "orange";
+    hint.innerHTML = "Medium: Add uppercase, number & symbol";
+  } 
+  else {
+    hint.style.color = "green";
+    hint.innerHTML = "Strong password";
+  }
 }
 </script>
 
