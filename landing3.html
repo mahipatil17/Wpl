@@ -1,308 +1,504 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FY Connect</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FY Connect — Student Network</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Inter", sans-serif;
-    }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;overflow-x:hidden;}
+    a{text-decoration:none;}
 
-    body {
-      min-height: 100vh;
-      color: #1a1a2e;
-    }
-
-    a {
-      text-decoration: none;
-    }
-
+    #bg-video{position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-2;}
+   
     /* NAVBAR */
-    .navbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 18px 60px;
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.3);
+    nav{
+      position:sticky;top:0;z-index:200;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:18px 60px;
+      color: #000;
+      background:rgb(255, 255, 255);
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      transition:background .3s;
     }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-
-    .logo-box {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: #111;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-    }
-
-    .nav-actions {
-      display: flex;
-      gap: 12px;
-    }
-
-    .login-btn {
-      padding: 8px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(0,0,0,0.15);
-      background: rgba(255,255,255,0.9);
-      font-size: 13px;
-      color: #111;
-      transition: 0.2s;
-    }
-
-    .login-btn:hover {
-      background: #111;
-      color: white;
-    }
+    .logo{display:flex;align-items:center;gap:10px;}
+    .logo-box{width:36px;height:36px;border-radius:10px;background:#000000;display:flex;align-items:center;justify-content:center;font-size:16px;}
+    .logo-text{font-family:'Sora',sans-serif;font-size:17px;font-weight:600;}
+    .nav-btns{display:flex;gap:10px;}
+    .nav-btn{padding:8px 20px;border-radius:999px;font-size:13.5px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .2s;}
+    .nav-btn-ghost{background:rgb(0, 0, 0);border:1px solid rgb(0, 0, 0);color:white;}
+    .nav-btn-ghost:hover{background:rgb(0, 0, 0);}
+    .nav-btn-solid{background:#000000;color:rgb(255, 255, 255);border:none;}
+    .nav-btn-solid:hover{background:#fafafa;color:rgb(0, 0, 0);transform:translateY(-1px);}
 
     /* HERO */
-    .hero {
-      text-align: center;
-      padding: 100px 20px 80px;
-      z-index: 1;
+    .hero{
+      min-height:calc(100vh - 74px);
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      text-align:center;padding:60px 20px;
+    }
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:5px 14px;border-radius:999px;
+      background:rgba(80,70,229,0.22);
+      border:1px solid rgba(129,140,248,0.35);
+      font-size:12.5px;color:#c7d2fe;margin-bottom:28px;
+      backdrop-filter:blur(8px);
+    }
+    .badge-dot{width:6px;height:6px;border-radius:50%;background:#818cf8;animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+    .hero h1{
+      font-family:'Sora',sans-serif;
+      font-size:clamp(38px,6vw,68px);
+      font-weight:700;line-height:1.1;
+      letter-spacing:-1.5px;margin-bottom:22px;
+    }
+    .hero h1 span{color:#ffffff;}
+    .hero p{max-width:540px;font-size:16px;color:rgba(255,255,255,0.72);line-height:1.7;margin-bottom:36px;}
+    .hero-btns{display:flex;gap:12px;justify-content:center;margin-bottom:60px;}
+    .hero-btn-primary{
+      padding:13px 30px;border-radius:10px;border:none;
+      background:#000000;color:white;font-size:15px;font-weight:500;
+      font-family:'DM Sans',sans-serif;cursor:pointer;
+      transition:all .2s;box-shadow:0 8px 24px rgba(80,70,229,0.45);
+    }
+    .hero-btn-primary:hover{background:#e6e6e6;color:#000;transform:translateY(-2px);}
+    .hero-btn-outline{
+      padding:13px 30px;border-radius:10px;
+      border:1.5px solid rgba(255,255,255,0.22);
+      background:rgb(237, 237, 237);color:rgb(0, 0, 0);
+      font-size:15px;font-weight:500;
+      font-family:'DM Sans',sans-serif;cursor:pointer;
+      backdrop-filter:blur(8px);transition:all .2s;
+    }
+    .hero-btn-outline:hover{background:rgba(255,255,255,0.13);}
+
+    /* STATS ROW */
+    .stats-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+    .stat-pill{
+      background:rgb(255, 255, 255);
+      color:black;
+      backdrop-filter:blur(12px);
+      border:1px solid rgba(255,255,255,0.13);
+      border-radius:12px;padding:14px 22px;text-align:center;min-width:110px;
+    }
+    .stat-pill h3{font-family:'Sora',sans-serif;font-size:26px;font-weight:700;}
+    .stat-pill p{font-size:12px;color:rgba(255,255,255,0.55);margin-top:2px;}
+
+    /* ── SCROLL SECTIONS — solid dark bg so video doesn't show ── */
+    .scroll-section{
+      position:relative;z-index:10;
+      background:linear-gradient(180deg,#0d0b2a 0%,#0a1228 100%);
     }
 
-    .hero h1 {
-      font-size: 52px;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: -1px;
-      text-shadow: 0 6px 20px rgba(0,0,0,0.8);
+    /* SECTION WRAPPER */
+    .sec{padding:90px 60px;max-width:1100px;margin:0 auto;}
+    .sec-tag{
+      display:inline-flex;align-items:center;gap:6px;
+      font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;
+      color:#818cf8;background:rgba(80,70,229,0.15);
+      border:1px solid rgba(80,70,229,0.25);
+      padding:4px 12px;border-radius:999px;margin-bottom:14px;
     }
+    .sec-title{font-family:'Sora',sans-serif;font-size:clamp(26px,3.5vw,38px);font-weight:700;line-height:1.2;margin-bottom:10px;}
+    .sec-sub{font-size:15px;color:rgba(255,255,255,0.55);line-height:1.7;max-width:540px;margin-bottom:48px;}
 
-    .hero p {
-      max-width: 600px;
-      margin: 20px auto 30px;
-      color: #eaeaea;
-      font-size: 15px;
+    /* ── FEATURES GRID (6 cards) ── */
+    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+    .feat-card{
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.09);
+      border-radius:16px;padding:26px;
+      transition:transform .25s,background .25s,border-color .25s;
+      cursor:default;
     }
+    .feat-card:hover{transform:translateY(-6px);background:rgba(255,255,255,0.08);border-color:rgba(129,140,248,0.3);}
+    .feat-icon{font-size:30px;margin-bottom:14px;display:block;}
+    .feat-card h3{font-family:'Sora',sans-serif;font-size:15.5px;font-weight:600;margin-bottom:8px;}
+    .feat-card p{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7;}
 
-    .hero-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 14px;
-      margin-bottom: 50px;
+    /* ── HOW IT WORKS ── */
+    .steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;}
+    .steps-row::before{
+      content:'';position:absolute;top:32px;left:calc(12.5%);
+      width:75%;height:2px;
+      background:linear-gradient(90deg,#5046e5,#3b82f6);
+      z-index:0;
     }
-
-    .btn-primary {
-      background: #111;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      transition: 0.2s;
+    .step-item{text-align:center;position:relative;z-index:1;padding:0 16px;}
+    .step-num{
+      width:64px;height:64px;border-radius:50%;
+      background:linear-gradient(135deg,#5046e5,#3b82f6);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Sora',sans-serif;font-size:20px;font-weight:700;
+      margin:0 auto 18px;border:3px solid #0d0b2a;
     }
+    .step-item h4{font-family:'Sora',sans-serif;font-size:14px;font-weight:600;margin-bottom:6px;}
+    .step-item p{font-size:12.5px;color:rgba(255,255,255,0.5);line-height:1.6;}
 
-    .btn-primary:hover {
-      transform: translateY(-2px);
+    /* ── COMMUNITY TYPES ── */
+    .community-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+    .comm-card{
+      border-radius:16px;padding:28px;
+      display:flex;align-items:flex-start;gap:18px;
+      border:1px solid rgba(255,255,255,0.08);
+      transition:transform .25s,border-color .25s;
     }
+    .comm-card:hover{transform:translateY(-4px);border-color:rgba(129,140,248,0.3);}
+    .comm-card-1{background:linear-gradient(135deg,rgba(80,70,229,.18),rgba(80,70,229,.06));}
+    .comm-card-2{background:linear-gradient(135deg,rgba(59,130,246,.18),rgba(59,130,246,.06));}
+    .comm-card-3{background:linear-gradient(135deg,rgba(16,185,129,.18),rgba(16,185,129,.06));}
+    .comm-card-4{background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.06));}
+    .comm-icon{width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+    .comm-info h3{font-family:'Sora',sans-serif;font-size:15px;font-weight:600;margin-bottom:6px;}
+    .comm-info p{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.6;}
+    .comm-tag{display:inline-block;margin-top:8px;font-size:11px;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6);}
 
-    .btn-outline {
-      background: rgba(255,255,255,0.8);
-      padding: 12px 24px;
-      border-radius: 8px;
-      color: #111;
+    /* ── TESTIMONIALS ── */
+    .testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+    .testi-card{
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.09);
+      border-radius:16px;padding:24px;
     }
+    .testi-stars{color:#f59e0b;font-size:13px;margin-bottom:12px;letter-spacing:2px;}
+    .testi-text{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.7;margin-bottom:18px;font-style:italic;}
+    .testi-author{display:flex;align-items:center;gap:10px;}
+    .testi-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#5046e5,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;}
+    .testi-name{font-size:13px;font-weight:600;}
+    .testi-meta{font-size:11.5px;color:rgba(255,255,255,0.45);margin-top:1px;}
 
-    /* STATS */
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      flex-wrap: wrap;
+    /* ── CTA BANNER ── */
+    .cta-banner{
+      background:linear-gradient(135deg,#3730a3 0%,#5046e5 50%,#3b82f6 100%);
+      border-radius:20px;padding:60px;text-align:center;
+      margin:0 60px;position:relative;overflow:hidden;
     }
-
-    .stat {
-      background: rgba(255,255,255,0.85);
-      padding: 14px 20px;
-      border-radius: 12px;
-      min-width: 120px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    .cta-banner::before{
+      content:'';position:absolute;inset:0;
+      background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
     }
+    .cta-banner h2{font-family:'Sora',sans-serif;font-size:clamp(24px,3vw,36px);font-weight:700;margin-bottom:12px;position:relative;}
+    .cta-banner p{font-size:15px;color:rgba(255,255,255,0.75);margin-bottom:28px;position:relative;}
+    .cta-btns{display:flex;gap:12px;justify-content:center;position:relative;}
+    .cta-btn-white{padding:12px 28px;border-radius:10px;background:white;color:#3730a3;font-size:14.5px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+    .cta-btn-white:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+    .cta-btn-ghost{padding:12px 28px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.3);background:transparent;color:white;font-size:14.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+    .cta-btn-ghost:hover{background:rgba(255,255,255,0.12);}
 
-    .stat h2 {
-      font-size: 24px;
+    /* DIVIDER */
+    .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);margin:0 60px;}
+
+    /* FOOTER */
+    footer{
+      background:#080618;
+      padding:40px 60px 30px;
+      border-top:1px solid rgba(255,255,255,0.06);
     }
+    .footer-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;}
+    .footer-brand .logo-text{font-size:18px;}
+    .footer-brand p{font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px;max-width:240px;line-height:1.6;}
+    .footer-links h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.4);margin-bottom:12px;}
+    .footer-links a{display:block;font-size:13.5px;color:rgba(255,255,255,0.6);margin-bottom:8px;transition:color .2s;}
+    .footer-links a:hover{color:#818cf8;}
+    .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);font-size:12.5px;color:rgba(255,255,255,0.3);}
+    .footer-bottom a{color:#818cf8;}
 
-    .stat p {
-      font-size: 13px;
-      color: #333;
+    /* SCROLL REVEAL */
+    .reveal{opacity:0;transform:translateY(32px);transition:opacity .6s ease,transform .6s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+
+    @media(max-width:768px){
+      nav{padding:16px 20px;}
+      .sec{padding:60px 20px;}
+      .features-grid,.steps-row,.community-grid,.testimonials-grid{grid-template-columns:1fr;}
+      .steps-row::before{display:none;}
+      .cta-banner{margin:0 20px;padding:40px 24px;}
+      footer{padding:40px 20px 24px;}
+      .footer-top{flex-direction:column;gap:28px;}
     }
-
-    /* FEATURES */
-    .features {
-      padding: 80px 40px;
-      text-align: center;
-    }
-
-    .features h2 {
-      font-size: 28px;
-      color: #fff;
-      margin-bottom: 10px;
-    }
-
-    .features-sub {
-      color: #ddd;
-      margin-bottom: 40px;
-    }
-
-    .features-grid {
-      max-width: 1000px;
-      margin: auto;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-    }
-
-    .feature-card {
-      background: rgba(255,255,255,0.9);
-      padding: 20px;
-      border-radius: 14px;
-      text-align: left;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-      transition: 0.2s;
-    }
-
-    .feature-card:hover {
-      transform: translateY(-4px);
-    }
-
-    .feature-card h3 {
-      margin-bottom: 6px;
-      color: #111;
-    }
-
-    .feature-card p {
-      color: #444;
-      font-size: 14px;
-    }
-
-    /* BACKGROUND */
-    #bg-video {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -1;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.65);
-      z-index: -1;
-    }
-
-    /* CONTACT */
-    .contact {
-      text-align: center;
-      padding: 60px 20px;
-      background: rgba(255,255,255,0.9);
-      margin-top: 60px;
-    }
-
-    .contact h2 {
-      margin-bottom: 10px;
-    }
-
-    .contact p {
-      color: #444;
-      font-size: 14px;
-    }
-
   </style>
 </head>
-
 <body>
 
-<video autoplay muted loop id="bg-video">
+<video autoplay muted loop playsinline id="bg-video">
   <source src="video.mp4" type="video/mp4">
 </video>
+<div class="overlay"></div>
 
-<div class="navbar">
+<!-- NAV -->
+<nav>
   <div class="logo">
     <div class="logo-box">🎓</div>
-    FY Connect
+    <span class="logo-text">FY Connect</span>
   </div>
-
-  <div class="nav-actions">
-    <a href="/fyconnect/login.php" class="login-btn">Student Login</a>
-    <a href="/fyconnect/admin_login.html" class="login-btn">Admin</a>
+  <div class="nav-btns">
+    <a href="login.php"><button class="nav-btn nav-btn-ghost">Student Login</button></a>
+    <a href="admin_login.php"><button class="nav-btn nav-btn-solid">Admin</button></a>
   </div>
-</div>
+</nav>
 
+<!-- HERO -->
 <section class="hero">
-  <h1>Connect. Collaborate.<br>Build Networks.</h1>
-
-  <p>The ultimate platform for first-year students to discover peers, join groups, and build meaningful connections.</p>
-
-  <div class="hero-buttons">
-    <a href="/fyconnect/login.php" class="btn-primary">Get Started</a>
-    <a href="#" class="btn-outline">Learn More</a>
+  <h1 style="color:rgb(248, 248, 248); text-shadow: 1px 1px 0 #000, 2px 2px 0 #000, 3px 3px 0 #000, 4px 4px 5px rgba(0,0,0,0.5);">Connect. Collaborate.<br><span>Build Networks.</span></h1>
+  <p>The ultimate platform for first-year students to discover peers, join communities, and build meaningful connections that last a lifetime.</p>
+  <div class="hero-btns">
+    <a href="login.php"><button class="hero-btn-primary">Get Started </button></a>
+    <a href="#features"><button class="hero-btn-outline">Learn More</button></a>
   </div>
-
-  <div class="stats">
-    <div class="stat"><h2>100+</h2><p>Students</p></div>
-    <div class="stat"><h2>15+</h2><p>Groups</p></div>
-    <div class="stat"><h2>50+</h2><p>Connections</p></div>
-    <div class="stat"><h2>24/7</h2><p>Access</p></div>
+  <div class="stats-row">
+    <div class="stat-pill"><h3>100+</h3><p style="color:black;">Students</p></div>
+    <div class="stat-pill"><h3>15+</h3><p style="color:black;">Groups</p></div>
+    <div class="stat-pill"><h3>50+</h3><p style="color:black;">Connections</p></div>
+    <div class="stat-pill"><h3>5</h3><p style="color:black;">Colleges</p></div>
   </div>
 </section>
 
-<section class="features">
-  <h2>Everything You Need</h2>
-  <p class="features-sub">Simple tools to help you connect</p>
+<!-- ═══════════ SCROLL SECTIONS ═══════════ -->
+<div class="scroll-section">
 
-  <div class="features-grid">
-    <div class="feature-card">
-      <h3>Find Batchmates</h3>
-      <p>Connect with students from your branch.</p>
-    </div>
+  <!-- FEATURES -->
+  <div class="sec reveal" id="features">
+    <div class="sec-title">Platform Features</div>
+    <h2 class="sec-title">Everything you need to thrive<br>in your first year</h2>
+    <p class="sec-sub">Built specifically for engineering students in Mumbai — discover, connect, and grow together.</p>
 
-    <div class="feature-card">
-      <h3>Interest Groups</h3>
-      <p>Join communities and events.</p>
-    </div>
-
-    <div class="feature-card">
-      <h3>Hostel Communities</h3>
-      <p>Stay connected with hostel mates.</p>
-    </div>
-
-    <div class="feature-card">
-      <h3>Carpool</h3>
-      <p>Find travel buddies easily.</p>
+    <div class="features-grid">
+      <div class="feat-card">
+        <span class="feat-icon"></span>
+        <h3>Discover Batchmates</h3>
+        <p>Find students from your branch, year, and college. Filter by skills, interests, and what they're looking for.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon"></span>
+        <h3>Join Communities</h3>
+        <p>Coding clubs, hostel groups, travel carpools — join communities that match your lifestyle and goals.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon"></span>
+        <h3>Campus Events</h3>
+        <p>Never miss a hackathon, cultural fest, or tech meetup. Stay updated on everything happening around you.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon"></span>
+        <h3>Skill Matching</h3>
+        <p>Show your skills and find teammates who complement you. Build the perfect team for your next project.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon"></span>
+        <h3>Carpool & Travel</h3>
+        <p>Find daily commute buddies from your area. Split costs, save time, and make friends on the way.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon"></span>
+        <h3>Build Your Profile</h3>
+        <p>Showcase your bio, skills, LinkedIn, and portfolio. Make a strong first impression before you even meet.</p>
+      </div>
     </div>
   </div>
-</section>
 
-<section class="contact">
-  <h2>Contact Us</h2>
-  <p>Email: support@fyconnect.com</p>
-  <p>Phone: +91 9876543210</p>
-</section>
+  <div class="divider"></div>
 
+  <!-- HOW IT WORKS -->
+  <div class="sec reveal">
+    <div class="sec-title">How It Works</div>
+    <h2 class="sec-title">Up and running in minutes</h2>
+    <p class="sec-sub">Four simple steps to go from zero to fully connected on campus.</p>
+
+    <div class="steps-row">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <h4>Register</h4>
+        <p>Create your account with your college email and basic info — takes under 2 minutes.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <h4>Build Profile</h4>
+        <p>Add your bio, skills, interests, and links so others can discover you on the platform.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <h4>Discover People</h4>
+        <p>Browse student cards filtered by branch, college, and skills. Click to see full profiles.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <h4>Join Groups</h4>
+        <p>Find communities that match your interests and join them — hostel, coding, travel, and more.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- COMMUNITY TYPES -->
+  <div class="sec reveal">
+    <div class="sec-title"> Communities</div>
+    <h2 class="sec-title">Find your tribe</h2>
+    <p class="sec-sub">Every type of student community, all in one place.</p>
+
+    <div class="community-grid">
+      <div class="comm-card comm-card-1">
+        <div class="comm-info">
+          <h3>Coding &amp; Tech Clubs</h3>
+          <p>Join hackathon teams, web dev clubs, and ML groups. Collaborate on real projects and win competitions together.</p>
+          <span class="comm-tag">Hackathons · Open Source · Dev Projects</span>
+        </div>
+      </div>
+      <div class="comm-card comm-card-2">
+        <div class="comm-info">
+          <h3>Hostel Communities</h3>
+          <p>Connect with your block mates, organize events, share resources, and make your hostel feel like home.</p>
+          <span class="comm-tag">Block A · Block B · PG Groups</span>
+        </div>
+      </div>
+      <div class="comm-card comm-card-3">
+        <div class="comm-info">
+          <h3>Carpool &amp; Travel Groups</h3>
+          <p>Find commute buddies from your neighbourhood. Save money, reduce travel time, and gain friends on the way.</p>
+          <span class="comm-tag">Andheri · Thane · Navi Mumbai</span>
+        </div>
+      </div>
+      <div class="comm-card comm-card-4">
+        <div class="comm-info">
+          <h3>Interest &amp; Hobby Groups</h3>
+          <p>Photography, music, gaming, finance — connect with people who share your passions beyond academics.</p>
+          <span class="comm-tag">Photography · Gaming · Finance · Music</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- TESTIMONIALS -->
+  <div class="sec reveal">
+    <h2 class="sec-title">Loved by first-year students</h2>
+    <p class="sec-sub">Real experiences from students who found their community on FY Connect.</p>
+
+    <div class="testimonials-grid">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Found my entire hackathon team through FY Connect. We won third place at HackX — couldn't have done it without this platform!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar">RS</div>
+          <div>
+            <div class="testi-name">Rahul Sharma</div>
+            <div class="testi-meta">CS · KJ Somaiya · First Year</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The discover page helped me find people with the same UI/UX interest. Now we're building a design portfolio together!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar">PP</div>
+          <div>
+            <div class="testi-name">Priya Patel</div>
+            <div class="testi-meta">IT · KJ Somaiya · First Year</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Joined the Andheri Carpool group and saved ₹2000 in my first month! Also made three great friends on the commute."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">VS</div>
+          <div>
+            <div class="testi-name">Vikram Singh</div>
+            <div class="testi-meta">CS · DJ Sanghvi · First Year</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- COLLEGES -->
+  <div class="sec reveal" style="text-align:center;">
+    <h2 class="sec-title">Across Mumbai's top engineering colleges</h2>
+    <p class="sec-sub" style="margin:0 auto 40px;">Students from 5 leading institutions are already on FY Connect.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">
+      <div style="padding:14px 22px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:14px;font-weight:500;">🏛️ KJ Somaiya College of Engineering</div>
+      <div style="padding:14px 22px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:14px;font-weight:500;">🏛️ VJTI Mumbai</div>
+      <div style="padding:14px 22px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:14px;font-weight:500;">🏛️ SPIT Mumbai</div>
+      <div style="padding:14px 22px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:14px;font-weight:500;">🏛️ DJ Sanghvi College of Engineering</div>
+      <div style="padding:14px 22px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;font-size:14px;font-weight:500;">🏛️ Thadomal Shahani Engineering College</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- CTA BANNER -->
+  <div style="padding:80px 0;" class="reveal">
+    <div class="cta-banner">
+      <h2>Ready to find your people?</h2>
+      <p>Join hundreds of first-year students already connecting on FY Connect. It's free, fast, and built for you.</p>
+      <div class="cta-btns">
+        <a href="login.php?register=1"><button class="cta-btn-white">Create Free Account →</button></a>
+        <a href="login.php"><button class="cta-btn-ghost">Login</button></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo" style="margin-bottom:10px;">
+          <div class="logo-box">🎓</div>
+          <span class="logo-text">FY Connect</span>
+        </div>
+        <p>The student networking platform built for Mumbai's first-year engineering students.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Platform</h4>
+        <a href="login.php">Login</a>
+        <a href="login.php?register=1">Register</a>
+        <a href="admin_login.php">Admin</a>
+      </div>
+      <div class="footer-links">
+        <h4>Features</h4>
+        <a href="login.php">Discover Students</a>
+        <a href="login.php">Join Groups</a>
+        <a href="login.php">Campus Events</a>
+      </div>
+      <div class="footer-links">
+        <h4>Contact</h4>
+        <a href="mailto:support@fyconnect.com">support@fyconnect.com</a>
+        <a href="#">Report an Issue</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 FY Connect · Built for First Year Students</span>
+    </div>
+  </footer>
+
+</div><!-- /scroll-section -->
+
+<script>
+/* Scroll reveal */
+var reveals = document.querySelectorAll('.reveal');
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12 });
+reveals.forEach(function(el) { observer.observe(el); });
+
+/* Sticky nav bg on scroll */
+var nav = document.querySelector('nav');
+window.addEventListener('scroll', function() {
+  nav.style.background = window.scrollY > 60
+    ? 'rgba(8,6,24,0.95)'
+    : 'rgba(15,12,50,0.6)';
+});
+</script>
 </body>
 </html>
