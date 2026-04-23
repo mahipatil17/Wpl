@@ -1,127 +1,227 @@
 <?php
 session_start();
+include 'db.php';
+if (!isset($_SESSION['user'])) { header("Location: login.php"); exit(); }
 
-if (!isset($_SESSION['user'])) {
-    header("Location: login.php");
-    exit();
-}
+$id = $_SESSION['user']['id'];
+$result = $conn->query("SELECT * FROM users WHERE id=$id");
+$user = $result->fetch_assoc();
 
-$user = $_SESSION['user'];
+$initials = strtoupper(substr($user['name'],0,1) . (strpos($user['name'],' ')!==false ? substr($user['name'],strpos($user['name'],' ')+1,1) : ''));
 
-$profile_img = "uploads/default.png";
-if (!empty($user['profile_pic']) && file_exists("uploads/" . $user['profile_pic'])) {
-    $profile_img = "uploads/" . $user['profile_pic'];
-}
+// Count groups
+$groups_count = $conn->query("SELECT COUNT(*) as t FROM group_members WHERE user_id=$id")->fetch_assoc()['t'];
+$my_groups = $conn->query("SELECT g.name FROM groups g JOIN group_members gm ON g.id=gm.group_id WHERE gm.user_id=$id LIMIT 5");
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>My Profile | FY Connect</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="profile.css">
+  <title>My Profile | FY Connect</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .profile-layout { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
+
+    /* SIDEBAR */
+    .profile-sidebar { display: flex; flex-direction: column; gap: 14px; }
+    .avatar-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; text-align: center; box-shadow: var(--shadow); }
+    .profile-photo-wrap { position: relative; width: 80px; margin: 0 auto 14px; }
+    .profile-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--indigo-light); }
+    .profile-name { font-size: 17px; font-weight: 600; }
+    .profile-branch { font-size: 13px; color: var(--muted); margin-top: 3px; margin-bottom: 14px; }
+    .profile-stats-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .ps-mini { background: var(--bg); border-radius: 8px; padding: 10px; text-align: center; }
+    .ps-mini-num { font-size: 18px; font-weight: 600; color: var(--indigo); font-family: 'Sora', sans-serif; }
+    .ps-mini-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .vis-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); }
+    .vis-label { font-size: 13px; font-weight: 500; }
+    .vis-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .toggle-switch { position: relative; width: 40px; height: 22px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: #d1d5db; border-radius: 999px; cursor: pointer; transition: background 0.2s; }
+    .toggle-slider::before { content:''; position:absolute; width:16px; height:16px; left:3px; top:3px; background:white; border-radius:50%; transition: transform 0.2s; }
+    .toggle-switch input:checked + .toggle-slider { background: var(--indigo); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+    /* MAIN FORM */
+    .profile-form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
+    .form-section-title { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-top: 20px; }
+    .form-section-title:first-child { margin-top: 0; }
+
+    .photo-upload-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+    .photo-preview { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--indigo-light); }
+    .upload-info { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    .save-row { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+    .save-success { font-size: 13px; color: var(--success); display: flex; align-items: center; gap: 5px; }
+
+    .groups-list { list-style: none; }
+    .groups-list li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; display: flex; align-items: center; gap: 8px; }
+    .groups-list li:last-child { border-bottom: none; }
+  </style>
 </head>
 <body>
 
-<nav class="navbar">
-  <div class="nav-left">
-    <div class="logo-box">🎓</div>
-    <div class="brand">
-      <h3>FY Connect</h3>
-      <p>Student Community</p>
+<?php include 'navbar.php'; ?>
+
+<div class="page-wrap">
+
+  <div class="profile-layout">
+
+    <!-- SIDEBAR -->
+    <div class="profile-sidebar">
+      <div class="avatar-card">
+        <?php if(!empty($user['photo'])): ?>
+          <img src="<?php echo htmlspecialchars($user['photo']); ?>" class="profile-photo" style="display:block;margin:0 auto 14px">
+        <?php else: ?>
+          <div class="avatar avatar-xl avatar-indigo" style="margin:0 auto 14px"><?php echo $initials; ?></div>
+        <?php endif; ?>
+
+        <div class="profile-name"><?php echo htmlspecialchars($user['name']); ?></div>
+        <div class="profile-branch"><?php echo htmlspecialchars($user['branch'] ?? ''); ?> · <?php echo htmlspecialchars($user['year'] ?? ''); ?></div>
+
+        <div class="profile-stats-mini">
+          <div class="ps-mini"><div class="ps-mini-num"><?php echo $groups_count; ?></div><div class="ps-mini-lbl">Groups</div></div>
+          <div class="ps-mini"><div class="ps-mini-num">1</div><div class="ps-mini-lbl">Profile</div></div>
+        </div>
+      </div>
+
+      <!-- VISIBILITY TOGGLE -->
+      <div class="vis-toggle">
+        <div>
+          <div class="vis-label">Discoverable</div>
+          <div class="vis-sub">Appear in discover page</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="visToggle" <?php echo ($user['visibility'] ?? 1) ? 'checked' : ''; ?> onchange="updateVisibility(this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <!-- MY GROUPS -->
+      <?php if($groups_count > 0): ?>
+      <div class="card">
+        <div class="section-title">My Groups</div>
+        <ul class="groups-list">
+          <?php while($g = $my_groups->fetch_assoc()): ?>
+            <li>👥 <?php echo htmlspecialchars($g['name']); ?></li>
+          <?php endwhile; ?>
+        </ul>
+        <a href="groups.php" style="font-size:12px;color:var(--indigo);display:block;margin-top:10px">View all groups →</a>
+      </div>
+      <?php endif; ?>
     </div>
-  </div>
 
-  <div class="nav-center">
-    <a href="dashboard.php">Dashboard</a>
-    <a href="discover.php">Discover</a>
-    <a href="groups.php">Groups</a>
-    <a href="profile.php" class="active">My Profile</a>
-  </div>
+    <!-- MAIN FORM -->
+    <div class="profile-form-card">
 
-  <a href="logout.php">
-    <button class="create-btn">Logout</button>
-  </a>
-</nav>
+      <?php if(isset($_GET['success'])): ?>
+        <div class="msg-success">✓ Profile updated successfully!</div>
+      <?php endif; ?>
 
-<section class="profile-section">
+      <form method="POST" action="update_profile.php" enctype="multipart/form-data">
 
-  <div class="profile-card">
+        <div class="form-section-title">Basic Info</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input class="form-input" name="name" value="<?php echo htmlspecialchars($user['name']); ?>">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" name="email" type="email" value="<?php echo htmlspecialchars($user['email']); ?>">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Branch</label>
+            <input class="form-input" name="branch" value="<?php echo htmlspecialchars($user['branch'] ?? ''); ?>">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Year</label>
+            <select class="form-select" name="year">
+              <?php foreach(['First Year','Second Year','Third Year','Final Year'] as $y): ?>
+                <option <?php echo ($user['year'] ?? '') === $y ? 'selected' : ''; ?>><?php echo $y; ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select class="form-select" name="gender">
+              <?php foreach(['Male','Female','Prefer not to say'] as $g): ?>
+                <option <?php echo ($user['gender'] ?? '') === $g ? 'selected' : ''; ?>><?php echo $g; ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+        </div>
 
-    <div class="profile-header">
-      <h2 class="profile-title">My Profile</h2>
-      <div class="profile-pic">
-        <img src="<?php echo $profile_img; ?>" alt="Profile">
-      </div>
+        <div class="form-section-title">Profile Photo</div>
+        <div class="photo-upload-row">
+          <?php if(!empty($user['photo'])): ?>
+            <img src="<?php echo htmlspecialchars($user['photo']); ?>" class="photo-preview" alt="Current photo">
+          <?php else: ?>
+            <div class="avatar avatar-md avatar-indigo"><?php echo $initials; ?></div>
+          <?php endif; ?>
+          <div>
+            <input type="file" name="photo" accept="image/*" class="form-input" style="padding:6px">
+            <div class="upload-info">JPG, PNG · Max 5MB</div>
+          </div>
+        </div>
+
+        <div class="form-section-title">About You</div>
+        <div class="form-group">
+          <label class="form-label">Bio</label>
+          <textarea class="form-textarea" name="bio" rows="3"><?php echo htmlspecialchars($user['bio'] ?? ''); ?></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Skills</label>
+            <input class="form-input" name="skills" placeholder="e.g. Python, React, Figma" value="<?php echo htmlspecialchars($user['skills'] ?? ''); ?>">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Interests</label>
+            <input class="form-input" name="interests" placeholder="e.g. Hackathons, Music" value="<?php echo htmlspecialchars($user['interests'] ?? ''); ?>">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Looking For</label>
+          <select class="form-select" name="looking_for">
+            <?php foreach(['Hackathon Team','Travel Buddy','Hostel Friends','Roommate','Networking'] as $lf): ?>
+              <option <?php echo ($user['looking_for'] ?? '') === $lf ? 'selected' : ''; ?>><?php echo $lf; ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <div class="form-section-title">Links</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">LinkedIn</label>
+            <input class="form-input" name="linkedin" placeholder="https://linkedin.com/in/..." value="<?php echo htmlspecialchars($user['linkedin'] ?? ''); ?>">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Portfolio / GitHub</label>
+            <input class="form-input" name="portfolio" placeholder="https://yoursite.com" value="<?php echo htmlspecialchars($user['portfolio'] ?? ''); ?>">
+          </div>
+        </div>
+
+        <div class="save-row">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+
+      </form>
     </div>
 
-    <form action="profile_process.php" method="POST" enctype="multipart/form-data">
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Name</label>
-          <input type="text" name="name" value="<?php echo $user['name'] ?? ''; ?>">
-        </div>
-
-        <div class="form-group">
-          <label>Email</label>
-          <input type="text" name="email" value="<?php echo $user['email'] ?? ''; ?>">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Branch</label>
-          <select name="branch">
-            <option <?php if(($user['branch'] ?? '')=="Computer Science") echo "selected"; ?>>Computer Science</option>
-            <option <?php if(($user['branch'] ?? '')=="Electronics") echo "selected"; ?>>Electronics</option>
-            <option <?php if(($user['branch'] ?? '')=="Information Technology") echo "selected"; ?>>Information Technology</option>
-            <option <?php if(($user['branch'] ?? '')=="CBCS") echo "selected"; ?>>CBCS</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Year</label>
-          <select name="year">
-            <option <?php if(($user['year'] ?? '')=="First Year") echo "selected"; ?>>First Year</option>
-            <option <?php if(($user['year'] ?? '')=="Second Year") echo "selected"; ?>>Second Year</option>
-            <option <?php if(($user['year'] ?? '')=="Third Year") echo "selected"; ?>>Third Year</option>
-            <option <?php if(($user['year'] ?? '')=="Final Year") echo "selected"; ?>>Final Year</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Gender</label>
-          <select name="gender">
-            <option value="Male" <?php if(($user['gender'] ?? '')=="Male") echo "selected"; ?>>Male</option>
-            <option value="Female" <?php if(($user['gender'] ?? '')=="Female") echo "selected"; ?>>Female</option>
-            <option value="Do not prefer to say" <?php if(($user['gender'] ?? '')=="Do not prefer to say") echo "selected"; ?>>Do not prefer to say</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Profile Picture</label>
-          <input type="file" name="profile_pic" accept="image/*">
-        </div>
-      </div>
-
-      <div class="form-group full">
-        <label>Address</label>
-        <input type="text" name="address" value="<?php echo $user['address'] ?? ''; ?>">
-      </div>
-
-      <div class="btn-group">
-        <button type="submit" class="save-btn">Save Changes</button>
-      </div>
-
-    </form>
-
   </div>
+</div>
 
-</section>
-
+<script>
+function updateVisibility(checked) {
+  fetch('update_visibility.php?v=' + (checked ? 1 : 0));
+}
+</script>
 </body>
 </html>
