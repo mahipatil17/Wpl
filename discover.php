@@ -1,309 +1,206 @@
+<?php
+session_start();
+include 'db.php';
+if (!isset($_SESSION['user'])) { header("Location: login.php"); exit(); }
 
+$result = $conn->query("SELECT * FROM users WHERE visibility=1 ORDER BY id DESC");
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Discover Students | FY Connect</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discover | FY Connect</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .discover-header { margin-bottom: 22px; }
+    .discover-header h1 { font-size: 24px; font-weight: 600; }
+    .discover-header p { font-size: 13.5px; color: var(--muted); margin-top: 3px; }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="discover.css">
+    .filter-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
+
+    .students-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+
+    /* FLIP CARD */
+    .student-card { perspective: 900px; height: 280px; cursor: pointer; }
+    .card-inner {
+      position: relative; width: 100%; height: 100%;
+      transition: transform 0.55s cubic-bezier(0.4,0,0.2,1);
+      transform-style: preserve-3d;
+    }
+    .student-card.flipped .card-inner { transform: rotateY(180deg); }
+
+    .card-front, .card-back {
+      position: absolute; width: 100%; height: 100%;
+      backface-visibility: hidden; border-radius: var(--radius);
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-front { background: var(--surface); }
+    .card-back { background: var(--indigo); transform: rotateY(180deg); padding: 18px; display: flex; flex-direction: column; }
+
+    .card-photo {
+      height: 120px; background: linear-gradient(135deg, var(--indigo-light), #dbeafe);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 42px; overflow: hidden;
+    }
+    .card-photo img { width:100%; height:100%; object-fit:cover; display:block; }
+
+    .card-info { padding: 14px 16px; }
+    .card-name { font-size: 14.5px; font-weight: 600; }
+    .card-branch { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .card-hint { font-size: 11px; color: var(--indigo); margin-top: 8px; font-weight: 500; }
+
+    /* BACK */
+    .back-name { font-size: 15px; font-weight: 600; color: white; }
+    .back-branch { font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 10px; }
+    .back-section-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.6); margin-top: 8px; margin-bottom: 4px; }
+    .back-bio { font-size: 12px; color: rgba(255,255,255,0.85); line-height: 1.5; }
+    .back-tag { font-size: 10.5px; padding: 3px 8px; border-radius: var(--radius-pill); background: rgba(255,255,255,0.15); color: white; }
+    .back-links { display: flex; gap: 6px; margin-top: auto; padding-top: 10px; }
+    .back-link { font-size: 11.5px; padding: 5px 12px; border-radius: 6px; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); transition: background 0.15s; }
+    .back-link:hover { background: rgba(255,255,255,0.25); }
+
+    .no-results { text-align:center; padding: 60px 20px; color: var(--muted); }
+    .no-results h3 { font-size: 16px; margin-bottom: 6px; }
+  </style>
 </head>
 <body>
 
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar">
-  <div class="nav-left">
-    <div class="logo-box">🎓</div>
-    <h3>FY Connect</h3>
+<?php include 'navbar.php'; ?>
+
+<div class="page-wrap">
+
+  <div class="discover-header">
+    <h1>Discover Students</h1>
+    <p>Find batchmates with similar interests — click a card to see full profile</p>
   </div>
 
-  <div class="nav-center">
-    <a href="dashboard.php">Dashboard</a>
-    <a class="active" href="#">Discover</a>
-    <a href="groups.php">Groups</a>
-    <a href="profile.php">My Profile</a>
+  <div class="filter-wrap">
+    <input type="text" class="search-input" id="searchInput" placeholder="🔍  Search by name, branch, or skills..." oninput="filterCards()">
+    <button class="filter-chip active" onclick="setFilter(this,'all')">All</button>
+    <button class="filter-chip" onclick="setFilter(this,'Computer Science')">CS</button>
+    <button class="filter-chip" onclick="setFilter(this,'Information Technology')">IT</button>
+    <button class="filter-chip" onclick="setFilter(this,'Electronics')">EC</button>
+    <button class="filter-chip" onclick="setFilter(this,'First Year')">First Year</button>
   </div>
 
-  <div class="nav-right">
-    <span class="email">student@somaiya.edu</span>
-    <button class="login-btn"
-          onclick="
-            window.location.href = 'landing.html'">Logout</button>
+  <div class="students-grid" id="studentsGrid">
+
+    <?php $count = 0; while($u = $result->fetch_assoc()): $count++; ?>
+    <?php
+      $photo = !empty($u['photo']) ? $u['photo'] : '';
+      $name = htmlspecialchars($u['name']);
+      $branch = htmlspecialchars($u['branch'] ?? '');
+      $year = htmlspecialchars($u['year'] ?? '');
+      $bio = htmlspecialchars($u['bio'] ?? '');
+      $skills = htmlspecialchars($u['skills'] ?? '');
+      $interests = htmlspecialchars($u['interests'] ?? '');
+      $looking = htmlspecialchars($u['looking_for'] ?? '');
+      $linkedin = $u['linkedin'] ?? '';
+      $portfolio = $u['portfolio'] ?? '';
+      $initials = strtoupper(substr($u['name'],0,1));
+    ?>
+    <div class="student-card" onclick="this.classList.toggle('flipped')"
+         data-name="<?php echo strtolower($u['name']); ?>"
+         data-branch="<?php echo strtolower($u['branch'] ?? ''); ?>"
+         data-year="<?php echo strtolower($u['year'] ?? ''); ?>"
+         data-skills="<?php echo strtolower($u['skills'] ?? ''); ?>">
+      <div class="card-inner">
+        <!-- FRONT -->
+        <div class="card-front">
+          <div class="card-photo">
+            <?php if($photo): ?>
+              <img src="<?php echo htmlspecialchars($photo); ?>" alt="<?php echo $name; ?>">
+            <?php else: ?>
+              <span style="font-size:44px;opacity:0.4">👤</span>
+            <?php endif; ?>
+          </div>
+          <div class="card-info">
+            <div class="card-name"><?php echo $name; ?></div>
+            <div class="card-branch"><?php echo $branch; ?> · <?php echo $year; ?></div>
+            <?php if($skills): ?>
+              <div class="tag-row" style="margin-top:10px">
+                <?php foreach(array_slice(explode(',', $u['skills']), 0, 3) as $sk): ?>
+                  <span class="tag"><?php echo htmlspecialchars(trim($sk)); ?></span>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+            <div class="card-hint">Click to see full profile →</div>
+          </div>
+        </div>
+        <!-- BACK -->
+        <div class="card-back">
+          <div class="back-name"><?php echo $name; ?></div>
+          <div class="back-branch"><?php echo $branch; ?> · <?php echo $year; ?></div>
+          <?php if($bio): ?>
+            <div class="back-section-title">Bio</div>
+            <div class="back-bio"><?php echo $bio; ?></div>
+          <?php endif; ?>
+          <?php if($skills): ?>
+            <div class="back-section-title">Skills</div>
+            <div class="tag-row">
+              <?php foreach(array_slice(explode(',', $u['skills']), 0, 4) as $sk): ?>
+                <span class="back-tag"><?php echo htmlspecialchars(trim($sk)); ?></span>
+              <?php endforeach; ?>
+            </div>
+          <?php endif; ?>
+          <?php if($interests): ?>
+            <div class="back-section-title">Interests</div>
+            <div class="tag-row">
+              <?php foreach(array_slice(explode(',', $u['interests']), 0, 3) as $int): ?>
+                <span class="back-tag"><?php echo htmlspecialchars(trim($int)); ?></span>
+              <?php endforeach; ?>
+            </div>
+          <?php endif; ?>
+          <?php if($looking): ?>
+            <div class="back-section-title">Looking For</div>
+            <div class="back-bio"><?php echo $looking; ?></div>
+          <?php endif; ?>
+          <div class="back-links">
+            <?php if($linkedin): ?><a href="<?php echo htmlspecialchars($linkedin); ?>" target="_blank" class="back-link" onclick="event.stopPropagation()">LinkedIn</a><?php endif; ?>
+            <?php if($portfolio): ?><a href="<?php echo htmlspecialchars($portfolio); ?>" target="_blank" class="back-link" onclick="event.stopPropagation()">Portfolio</a><?php endif; ?>
+            <?php if(!$linkedin && !$portfolio): ?><span class="back-bio" style="font-size:11px">No links added yet</span><?php endif; ?>
+          </div>
+        </div>
+      </div>
+    </div>
+    <?php endwhile; ?>
+
+    <?php if($count === 0): ?>
+      <div class="no-results" style="grid-column:1/-1">
+        <h3>No students found</h3>
+        <p>Students will appear here once they complete their profile.</p>
+      </div>
+    <?php endif; ?>
   </div>
-</nav>
 
-<!-- ================= HEADER ================= -->
-<section class="header">
-  <h1>Find Your Batchmates</h1>
-  <p>Connect with 10 first-year students</p>
-</section>
-
-<!-- ================= FILTER SECTION ================= -->
-<section class="filter-box">
-  <h3>Search & Filter</h3>
-
-  <div class="filters">
-    <input type="text" placeholder="Search by name or email">
-
-    <select>
-      <option>All Branches</option>
-      <option>Computer Science</option>
-      <option>Information Technology</option>
-      <option>Electronics</option>
-      <option>CSBS</option>
-    </select>
-
-    <select>
-      <option>All Students</option>
-      <option>Hostel</option>
-      <option>Web developer</option>
-    </select>
-
-    <select>
-      <option>All Interests</option>
-      <option>Coding</option>
-      <option>Hackathons</option>
-      <option>Sports</option>
-      <option>Cultural</option>
-    </select>
-  </div>
-</section>
-
-<!-- ================= STUDENT GRID ================= -->
-<section class="students-section">
-  <p class="count">Showing 10 students</p>
-
-  <div class="students-grid">
-
-    <div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=12">
-  <h3>Rahul Sharma</h3>
-  <p class="branch">Computer Science - Div A</p>
-  <p class="desc">Passionate about AI and web development. Looking for hackathon teammates.</p>
-  <div class="tags">
-    <span>Coding</span>
-    <span>Hackathons</span>
-    <span>Web Development</span>
-  </div>
 </div>
 
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=5">
-  <h3>Priya Patel</h3>
-  <p class="branch">Information Technology - Div B</p>
-  <p class="desc">Designer and culture enthusiast. Love organizing events.</p>
-  <div class="tags">
-    <span>UI/UX</span>
-    <span>Cultural Events</span>
-    <span>Photography</span>
-  </div>
-</div>
+<script>
+var activeFilter = 'all';
 
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=33">
-  <h3>Arjun Kumar</h3>
-  <p class="branch">Computer Science - Div A</p>
-  <p class="desc">ML enthusiast and cricket lover. Daily commuter from Whitefield.</p>
-  <div class="tags">
-    <span>Machine Learning</span>
-    <span>Sports</span>
-  </div>
-</div>
+function setFilter(btn, val) {
+  activeFilter = val;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  filterCards();
+}
 
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=20">
-  <h3>Sneha Reddy</h3>
-  <p class="branch">Electronics - Div C</p>
-  <p class="desc">Robotics geek and dancer. Always up for tech challenges.</p>
-  <div class="tags">
-    <span>Robotics</span>
-    <span>Coding Competitions</span>
-    <span>Dance</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=15">
-  <h3>Vikram Singh</h3>
-  <p class="branch">Computer Science - Div B</p>
-  <p class="desc">Full-stack developer and gamer. Looking for carpool buddies.</p>
-  <div class="tags">
-    <span>Web Development</span>
-    <span>Hackathons</span>
-    <span>Gaming</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=45">
-  <h3>Ananya Iyer</h3>
-  <p class="branch">Information Technology - Div A</p>
-  <p class="desc">Music lover and debate enthusiast. Let’s organize events!</p>
-  <div class="tags">
-    <span>Cultural Events</span>
-    <span>Music</span>
-    <span>Debate</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=30">
-  <h3>Karan Mehta</h3>
-  <p class="branch">Computer Science - Div C</p>
-  <p class="desc">Interested in startups and app development.</p>
-  <div class="tags">
-    <span>Startups</span>
-    <span>App Development</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=28">
-  <h3>Riya Desai</h3>
-  <p class="branch">Electronics - Div A</p>
-  <p class="desc">IoT enthusiast. Love building smart devices.</p>
-  <div class="tags">
-    <span>IoT</span>
-    <span>Hardware</span>
-    <span>Hackathons</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=48">
-  <h3>Aditya Nair</h3>
-  <p class="branch">Information Technology - Div C</p>
-  <p class="desc">Cybersecurity beginner exploring ethical hacking.</p>
-  <div class="tags">
-    <span>Cybersecurity</span>
-    <span>Coding</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=41">
-  <h3>Meera Shah</h3>
-  <p class="branch">Computer Science - Div B</p>
-  <p class="desc">Content creator and tech blogger. Interested in AI projects.</p>
-  <div class="tags">
-    <span>AI</span>
-    <span>Blogging</span>
-    <span>Public Speaking</span>
-  </div>
-</div>
-    <div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=52">
-  <h3>Aryan Gupta</h3>
-  <p class="branch">Computer Science - Div A</p>
-  <p class="desc">Competitive programmer and problem-solving enthusiast.</p>
-  <div class="tags">
-    <span>Competitive Coding</span>
-    <span>DSA</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=60">
-  <h3>Ishita Rao</h3>
-  <p class="branch">Information Technology - Div B</p>
-  <p class="desc">Frontend developer and creative designer.</p>
-  <div class="tags">
-    <span>UI/UX</span>
-    <span>Web Development</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=24">
-  <h3>Rohan Verma</h3>
-  <p class="branch">Electronics - Div C</p>
-  <p class="desc">Interested in embedded systems and robotics.</p>
-  <div class="tags">
-    <span>Embedded Systems</span>
-    <span>Robotics</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=14">
-  <h3>Sakshi Kulkarni</h3>
-  <p class="branch">Computer Science - Div B</p>
-  <p class="desc">AI researcher in progress. Loves teamwork.</p>
-  <div class="tags">
-    <span>Machine Learning</span>
-    <span>Hackathons</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=37">
-  <h3>Manav Jain</h3>
-  <p class="branch">Information Technology - Div A</p>
-  <p class="desc">Cloud computing and DevOps beginner.</p>
-  <div class="tags">
-    <span>Cloud</span>
-    <span>DevOps</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=18">
-  <h3>Nikita Shah</h3>
-  <p class="branch">Electronics - Div B</p>
-  <p class="desc">Love music and organizing college events.</p>
-  <div class="tags">
-    <span>Cultural Events</span>
-    <span>Music</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=21">
-  <h3>Harsh Dubey</h3>
-  <p class="branch">Computer Science - Div C</p>
-  <p class="desc">Backend developer and open-source contributor.</p>
-  <div class="tags">
-    <span>Backend</span>
-    <span>Open Source</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=63">
-  <h3>Pooja Nair</h3>
-  <p class="branch">Information Technology - Div C</p>
-  <p class="desc">Cybersecurity enthusiast exploring ethical hacking.</p>
-  <div class="tags">
-    <span>Cybersecurity</span>
-    <span>Coding</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=8">
-  <h3>Dev Malhotra</h3>
-  <p class="branch">Computer Science - Div A</p>
-  <p class="desc">Startup ideas + mobile app development.</p>
-  <div class="tags">
-    <span>App Development</span>
-    <span>Startups</span>
-  </div>
-</div>
-
-<div class="student-card">
-  <img src="https://i.pravatar.cc/100?img=29">
-  <h3>Tanvi Joshi</h3>
-  <p class="branch">Electronics - Div A</p>
-  <p class="desc">IoT and automation projects enthusiast.</p>
-  <div class="tags">
-    <span>IoT</span>
-    <span>Automation</span>
-  </div>
-</div>
-
-  </div>
-</section>
+function filterCards() {
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('.student-card').forEach(function(card) {
+    var name = card.dataset.name || '';
+    var branch = card.dataset.branch || '';
+    var year = card.dataset.year || '';
+    var skills = card.dataset.skills || '';
+    var matchQ = !q || name.includes(q) || branch.includes(q) || skills.includes(q);
+    var matchF = activeFilter === 'all' || branch.includes(activeFilter.toLowerCase()) || year.includes(activeFilter.toLowerCase());
+    card.style.display = (matchQ && matchF) ? '' : 'none';
+  });
+}
+</script>
 
 </body>
 </html>
